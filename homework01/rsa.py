@@ -1,3 +1,7 @@
+"""Simple RSA implementation."""
+
+# pylint: disable=redefined-outer-name,unnecessary-lambda
+
 import random
 import typing as tp
 
@@ -45,16 +49,17 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     old_r, r = e, phi
     old_x, x = 1, 0
     while r != 0:
-        q = old_r // r
-        old_r, r = r, old_r - q * r
-        old_x, x = x, old_x - q * x
+        quotient = old_r // r
+        old_r, r = r, old_r - quotient * r
+        old_x, x = x, old_x - quotient * x
     return old_x % phi
 
 
 def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[int, int]]:
+    """Generates an RSA public/private key pair."""
     if not (is_prime(p) and is_prime(q)):
         raise ValueError("Both numbers must be prime.")
-    elif p == q:
+    if p == q:
         raise ValueError("p and q cannot be equal")
 
     # n = pq
@@ -82,6 +87,7 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
 
 def encrypt(pk: tp.Tuple[int, int], plaintext: str) -> tp.List[int]:
     # Unpack the key into it's components
+    """Encrypts plaintext with a key."""
     key, n = pk
     # Convert each letter in the plaintext to numbers based on
     # the character using a^b mod m
@@ -92,9 +98,10 @@ def encrypt(pk: tp.Tuple[int, int], plaintext: str) -> tp.List[int]:
 
 def decrypt(pk: tp.Tuple[int, int], ciphertext: tp.List[int]) -> str:
     # Unpack the key into its components
+    """Decrypts ciphertext with a key."""
     key, n = pk
     # Generate the plaintext based on the ciphertext and key using a^b mod m
-    plain = [chr((char ** key) % n) for char in ciphertext]
+    plain = [chr((char**key) % n) for char in ciphertext]
     # Return the array of bytes as a string
     return "".join(plain)
 
